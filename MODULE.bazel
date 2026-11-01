@@ -1,5 +1,5 @@
 module(
-    name = "rules_java_toolchains",
+    name = "java_toolchains",
     version = "0.0.1",
     bazel_compatibility = [">=7.0.0"],
     compatibility_level = 1,

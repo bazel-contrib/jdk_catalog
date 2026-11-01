@@ -10,7 +10,7 @@ load(
 
 package(default_visibility = ["//visibility:public"])
 
-# Runtime label, usable as java_runtime = "@rules_java_toolchains//toolchains:remotejdk_27"
+# Runtime label, usable as java_runtime = "@java_toolchains//toolchains:remotejdk_27"
 # and as --java_runtime_version=remotejdk_27.
 java_runtime_version_alias(
     name = "remotejdk_27",
