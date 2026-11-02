@@ -1,0 +1,6 @@
+{
+  "integrity": "",
+  "strip_prefix": "",
+  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/java_toolchains-{TAG}.tar.gz",
+  "docs_url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/java_toolchains-{TAG}.docs.tar.gz"
+}

@@ -23,10 +23,19 @@ machinery and only contributes the archive catalog.
 
 ## Usage
 
+This module is not yet released or published to the Bazel Central Registry.
+For now, add a Git override pinned to a commit whose module name is
+`java_toolchains`:
+
 ```starlark
 # MODULE.bazel
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "java_toolchains", version = "0.0.1")
+git_override(
+    module_name = "java_toolchains",
+    remote = "https://github.com/davido/java_toolchains.git",
+    commit = "5ba7b4f08019bccab1f560f29d1734ed55e3e985",
+)
 ```
 
 ```
@@ -38,21 +47,10 @@ build:java27 --tool_java_runtime_version=remotejdk_27
 ```
 
 ```
-bazel build --config=java27 //...
+bazelisk build --config=java27 //...
 ```
 
-### Before this module is published
-
-Until it lands on the Bazel Central Registry, pin it from GitHub:
-
-```starlark
-bazel_dep(name = "java_toolchains", version = "0.0.1")
-git_override(
-    module_name = "java_toolchains",
-    remote = "https://github.com/davido/java_toolchains.git",
-    commit = "<pin a commit>",
-)
-```
+After a release is admitted to the BCR, the Git override can be removed.
 
 ## Example
 
@@ -61,8 +59,33 @@ git_override(
 
 ```
 cd examples/consuming
-bazel run --config=java27 //:hello   # prints "Hello from JDK 27"
+bazelisk run --config=java27 //:hello   # prints "Hello from JDK 27"
+bazelisk test --config=java27 //:toolchain_test
 ```
+
+The test checks JDK 27 execution and Java 27 bytecode. The CI workflow covers
+Linux x86_64, macOS aarch64, and Windows x86_64 with Bazel 9.3.0, the minimum
+supported version.
+The remaining catalog architectures are not covered by that workflow.
+
+JDK archives are fetched on demand for selected toolchains; adding the module
+does not require downloading every platform's JDK. The configured repository
+cache can reuse archives across workspaces.
+
+See the [API reference](docs/README.md), [contributor guide](CONTRIBUTING.md),
+and [release procedure](RELEASING.md).
+
+## Maintenance and support
+
+David Ostrovsky ([@davido](https://github.com/davido)) maintains this project
+on a best-effort volunteer basis and is the point of contact for the Rules
+Authors SIG. The goal is to respond to issues and pull requests within
+2–3 weeks; there is no guaranteed response time or commercial support.
+Additional maintainers are welcome.
+
+The catalog follows non-LTS JDK releases, whose vendor maintenance windows are
+short. A catalog entry does not extend the vendor's security support. Retiring
+public labels follows the versioning policy in [RELEASING.md](RELEASING.md).
 
 ## Adding the next non-LTS release
 
@@ -71,7 +94,8 @@ bazel run --config=java27 //:hello   # prints "Hello from JDK 27"
 2. Add a `remote_jdkNN_repos()` macro and call it from `jdk/extensions.bzl`.
 3. List the new repos in `MODULE.bazel` (`use_repo` + `register_toolchains`).
 4. Add the `remotejdk_NN` alias and `toolchain_jdk_NN` to `toolchains/BUILD.bazel`.
-5. Drop a release from the catalog once it reaches end of support.
+5. Document the vendor's support window and announce any eventual removal as
+   described in [RELEASING.md](RELEASING.md).
 
 ## License
 

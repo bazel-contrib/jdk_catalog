@@ -1,0 +1,25 @@
+# Use Bazel's documentation extractor without adding a generator dependency.
+starlark_doc_extract(
+    name = "extensions",
+    src = "//jdk:extensions.bzl",
+    symbol_names = ["non_lts_jdks"],
+    deps = [
+        "//jdk:repositories.bzl",
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+        "@bazel_tools//tools/build_defs/repo:http.bzl",
+        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+        "@rules_java//toolchains:bzl_srcs",
+    ],
+)
+
+starlark_doc_extract(
+    name = "repositories",
+    src = "//jdk:repositories.bzl",
+    symbol_names = ["remote_jdk27_repos"],
+    deps = [
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+        "@bazel_tools//tools/build_defs/repo:http.bzl",
+        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+        "@rules_java//toolchains:bzl_srcs",
+    ],
+)

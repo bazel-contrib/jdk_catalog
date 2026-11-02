@@ -1,0 +1,27 @@
+# Follows rules_java's bazel-contrib release workflow. Publishing is manual.
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Existing release tag, e.g. v0.0.1
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  release:
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@6f477811ffc3ed8a972933cbb43dae0dc051767b # v7.3.0
+    with:
+      tag_name: ${{ inputs.tag_name }}
+      prerelease: false
+      draft: true
+      generate_release_notes: true
+      release_files: dist/java_toolchains-*.tar.gz
+      bazel_test_command: cd examples/consuming && bazelisk test --config=java27 //:toolchain_test

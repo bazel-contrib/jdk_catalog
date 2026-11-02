@@ -1,0 +1,13 @@
+{
+  "homepage": "https://github.com/davido/java_toolchains",
+  "maintainers": [
+    {
+      "email": "david@ostrovsky.org",
+      "github": "davido",
+      "name": "David Ostrovsky"
+    }
+  ],
+  "repository": ["github:davido/java_toolchains"],
+  "versions": [],
+  "yanked_versions": {}
+}

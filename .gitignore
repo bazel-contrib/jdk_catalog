@@ -2,3 +2,5 @@
 /examples/consuming/bazel-*
 MODULE.bazel.lock
 *.swp
+/dist/
+/examples/consuming/MODULE.bazel.lock

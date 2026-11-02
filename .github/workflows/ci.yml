@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  toolchains:
+    name: ${{ matrix.os }} / Bazel ${{ matrix.bazel }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+        bazel: [9.3.0]
+    runs-on: ${{ matrix.os }}
+    env:
+      USE_BAZEL_VERSION: ${{ matrix.bazel }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: bazel-contrib/setup-bazel@8d2cb86a3680a820c3e219597279ce3f80d17a47 # 0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          disk-cache: ${{ github.workflow }}-${{ matrix.os }}-${{ matrix.bazel }}
+      - name: Extract API documentation
+        run: bazelisk build //docs:extensions //docs:repositories
+      - name: Check generated API reference
+        shell: bash
+        run: |
+          bazelisk build //docs:extensions.textproto //docs:repositories.textproto
+          diff -u docs/extensions.textproto bazel-bin/docs/extensions.textproto
+          diff -u docs/repositories.textproto bazel-bin/docs/repositories.textproto
+      - name: Verify Java 27 compiler and runtime
+        working-directory: examples/consuming
+        run: bazelisk test --config=java27 --test_output=errors //:toolchain_test
+      - name: Verify numeric runtime selector
+        working-directory: examples/consuming
+        run: bazelisk test --config=java27 --java_runtime_version=27 --test_output=errors //:toolchain_test
+      - name: Run the example
+        working-directory: examples/consuming
+        run: bazelisk run --config=java27 //:hello

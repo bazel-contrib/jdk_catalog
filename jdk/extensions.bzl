@@ -20,4 +20,16 @@ def _non_lts_jdks_impl(module_ctx):
     remote_jdk27_repos()
     return module_ctx.extension_metadata(reproducible = True)
 
-non_lts_jdks = module_extension(implementation = _non_lts_jdks_impl)
+non_lts_jdks = module_extension(
+    implementation = _non_lts_jdks_impl,
+    doc = """Provides the non-LTS JDK archive and runtime-configuration repositories.
+
+The java_toolchains module uses this extension and registers the runtime and
+compilation toolchains automatically. Consumers normally need only bazel_dep;
+they do not need to call use_extension or register_toolchains themselves.
+
+Archives are fetched on demand when their toolchains are selected. There are no
+configuration tags. JDK 27 currently covers Linux x86_64, aarch64, ppc64le,
+riscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64.
+""",
+)

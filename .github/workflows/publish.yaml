@@ -1,0 +1,31 @@
+# Enable publication manually after the first release has been reviewed.
+name: Publish to BCR
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Published release tag, e.g. v0.0.1
+        required: true
+        type: string
+      registry_fork:
+        description: Writable BCR fork, e.g. davido/bazel-central-registry
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  publish:
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@0bd40ad4f872b4d216d3f01bc0844ade304e2b5a # v1.1.0
+    with:
+      tag_name: ${{ inputs.tag_name }}
+      registry_fork: ${{ inputs.registry_fork }}
+      draft: true
+      attest: true
+    secrets:
+      publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}

@@ -1,0 +1,9 @@
+module_docstring: "Module extension that instantiates the non-LTS remote JDK repositories."
+file: "//jdk:extensions.bzl"
+module_extension_info {
+  extension_name: "non_lts_jdks"
+  doc_string: "Provides the non-LTS JDK archive and runtime-configuration repositories.\n\nThe java_toolchains module uses this extension and registers the runtime and\ncompilation toolchains automatically. Consumers normally need only bazel_dep;\nthey do not need to call use_extension or register_toolchains themselves.\n\nArchives are fetched on demand when their toolchains are selected. There are no\nconfiguration tags. JDK 27 currently covers Linux x86_64, aarch64, ppc64le,\nriscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64."
+  origin_key {
+    file: "//jdk:extensions.bzl"
+  }
+}
