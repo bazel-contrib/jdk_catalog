@@ -30,4 +30,5 @@ the `.binaryproto` files use the standard Stardoc `ModuleInfo` format that the
 [BCR can render](https://github.com/bazelbuild/bazel-central-registry/blob/main/docs/stardoc.md).
 This uses Bazel's built-in extractor and adds no documentation dependencies.
 After editing public docstrings, copy the generated `.textproto` outputs to
-this directory. CI checks those snapshots using the pinned Bazel version.
+this directory. Check the snapshots with `python3 tools/check_api_docs.py`
+from the repository root. CI uses this checker with the pinned Bazel version.

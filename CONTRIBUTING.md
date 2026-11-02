@@ -13,6 +13,7 @@ version. From the repository root, build the API documentation:
 
 ```sh
 bazelisk build //docs:extensions //docs:repositories
+python3 tools/check_api_docs.py
 ```
 
 Run the integration test in the separate consuming module:
