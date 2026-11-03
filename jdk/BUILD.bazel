@@ -1,6 +1,80 @@
+load(":catalog.bzl", "REMOTE_JDK_CONFIGS_LIST")
+load(":check_catalog.bzl", "validate_configs")
+load(":manifest.bzl", "catalog_manifest")
+load(":repositories_util.bzl", "FLAT_CONFIGS")
+
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
+    "catalog.bzl",
+    "check_catalog.bzl",
+    "repositories_util.bzl",
     "repositories.bzl",
     "extensions.bzl",
 ])
+
+validate_configs()
+
+filegroup(name = "check_catalog")
+
+catalog_manifest(
+    name = "catalog_manifest",
+    content = json.encode([
+        {field: getattr(cfg, field, []) for field in [
+            "name",
+            "version",
+            "urls",
+            "sha256",
+            "strip_prefix",
+            "target_compatible_with",
+            "patch_cmds",
+        ]}
+        for cfg in REMOTE_JDK_CONFIGS_LIST
+    ]),
+)
+
+# Generate the struct entries for REMOTE_JDK_CONFIGS_LIST in catalog.bzl.
+# this downloads all the jdks and computes their sha256 sum, so can take a while
+# TODO(hvd): make this a sh_binary to update the configs in place
+genrule(
+    name = "dump_remote_jdk_configs",
+    outs = ["remote_jdks_config.out"],
+    cmd = """
+echo > $@
+while read -r config; do
+    TMP_FILE=$$(mktemp -q /tmp/remotejdk.XXXXXX)
+    IFS=\\| read -r name version urls strip_prefix target_compatible_with primary_url patch_cmds <<< "$$config"
+    echo "fetching: $$primary_url to $$TMP_FILE" > /dev/stderr
+    curl --retry 5 --write-out '%{{onerror}}%{{url}}\n' --show-error --silent --fail -o $$TMP_FILE -L "$$primary_url" > /dev/stderr
+    sha256=`sha256sum $$TMP_FILE | cut -d' ' -f1`
+    echo "struct("
+    echo "  name = \\"$$name\\","
+    echo "  target_compatible_with = $$target_compatible_with,"
+    echo "  sha256 = \\"$$sha256\\","
+    echo "  strip_prefix = \\"$$strip_prefix\\","
+    echo "  urls = $$urls,"
+    echo "  version = \\"$$version\\","
+    if [[ "$$patch_cmds" != "[]" ]]; then
+      echo "  patch_cmds = $$patch_cmds,"
+    fi
+    echo "),"
+    rm -f "$$TMP_FILE"
+done <<< '{configs}' >> $@
+    """.format(configs = "\n".join([
+        "|".join([
+            config.name,
+            config.version,
+            json.encode(config.urls),
+            config.strip_prefix,
+            json.encode(config.target_compatible_with),
+            config.urls[0],
+            json.encode(config.patch_cmds),
+        ])
+        for config in FLAT_CONFIGS
+    ])),
+    tags = [
+        "local",
+        "manual",
+    ],
+    visibility = ["//visibility:public"],
+)

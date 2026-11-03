@@ -100,3 +100,24 @@ public labels follows the versioning policy in [RELEASING.md](RELEASING.md).
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
+
+## LTS catalog extraction prototype
+
+This branch also provides the LTS catalog extracted from rules_java HEAD
+575fa89, including fmeum's JDK 25.0.5 refresh. The existing JDK 27 toolchains
+and extension API remain available.
+
+`jdk/catalog.bzl` owns pins; `jdk/repositories_util.bzl` owns version and URL
+construction. `bazelisk query //jdk:check_catalog` checks their agreement without
+downloads. `bazelisk build //jdk:catalog_manifest` exports the selected pins.
+
+Regenerate entries with `bazelisk build //jdk:dump_remote_jdk_configs`, then
+replace the struct entries in `jdk/catalog.bzl` with the generated output and
+rerun the check. Regeneration downloads all configured JDK archives; it is a
+maintainer operation, not a build prerequisite. Do not run it merely to check
+the catalog. The original rules_java generator label forwards here.
+
+The rules_java fork reads this catalog through a normal module dependency.
+Module dependency cycles are supported by Bzlmod: this module continues using
+rules_java's toolchain APIs while its pure catalog file has no loads back into
+rules_java. All prototype consumers must pin the fork using a git override.

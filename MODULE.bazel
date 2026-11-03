@@ -1,13 +1,14 @@
 module(
     name = "java_toolchains",
-    version = "0.0.1",
+    version = "0.0.2-catalog.1",
     bazel_compatibility = [">=9.3.0"],
     compatibility_level = 1,
 )
 
 # The toolchain machinery (remote_java_repository, default_java_toolchain,
 # java_runtime_version_alias) lives in rules_java; this module only adds the
-# non-LTS JDK catalog on top of it.
+# JDK 27 toolchains on top of it; jdk/catalog.bzl additionally supplies the
+# LTS pin catalog consumed by the rules_java catalog-split prototype.
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "platforms", version = "1.1.0")
 
