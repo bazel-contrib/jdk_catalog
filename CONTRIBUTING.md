@@ -8,6 +8,11 @@ toolchain machinery. Include the JDK vendor, download URLs, archive layout,
 and verified SHA-256 checksums when updating the catalog. Do not download every
 platform archive just to run a local smoke test.
 
+Refresh the JDK 27 pins with `tools/update_jdk_catalog.py`: run it with
+`--dry-run` to check for a newer GA build (exit 1 when one exists), or without
+to regenerate `jdk/repositories.bzl` in place from the Azul and Adoptium
+metadata, then review, stage and push.
+
 Use [Bazelisk](https://github.com/bazelbuild/bazelisk) and the checked-in Bazel
 version. From the repository root, build the API documentation:
 
