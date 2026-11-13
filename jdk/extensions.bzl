@@ -24,7 +24,7 @@ non_lts_jdks = module_extension(
     implementation = _non_lts_jdks_impl,
     doc = """Provides the non-LTS JDK archive and runtime-configuration repositories.
 
-The java_toolchains module uses this extension and registers the runtime and
+The jdk_catalog module uses this extension and registers the runtime and
 compilation toolchains automatically. Consumers normally need only bazel_dep;
 they do not need to call use_extension or register_toolchains themselves.
 

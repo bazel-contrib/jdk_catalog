@@ -1,4 +1,4 @@
-# java_toolchains
+# jdk_catalog
 
 Non-LTS JDK toolchains for Bazel, packaged as a standalone bzlmod module on top
 of [`rules_java`](https://github.com/bazelbuild/rules_java).
@@ -15,9 +15,9 @@ machinery and only contributes the archive catalog.
 - Runtime toolchains for JDK 27 across linux (x86_64/aarch64/ppc64le/riscv64/s390x),
   macOS (x86_64/aarch64), and Windows (x86_64), selectable with
   `--java_runtime_version=remotejdk_27` (or `=27`).
-- `@java_toolchains//toolchains:remotejdk_27` — the runtime label, for use
+- `@jdk_catalog//toolchains:remotejdk_27` — the runtime label, for use
   as a `java_runtime = ...` attribute.
-- `@java_toolchains//toolchains:toolchain_jdk_27` — a compile toolchain that
+- `@jdk_catalog//toolchains:toolchain_jdk_27` — a compile toolchain that
   runs `javac` on JDK 27, selectable with `--java_language_version=27`. (The LTS
   toolchains top out at JDK 25, whose `javac` rejects source/target 27.)
 
@@ -25,15 +25,15 @@ machinery and only contributes the archive catalog.
 
 This module is not yet released or published to the Bazel Central Registry.
 For now, add a Git override pinned to a commit whose module name is
-`java_toolchains`:
+`jdk_catalog`:
 
 ```starlark
 # MODULE.bazel
 bazel_dep(name = "rules_java", version = "9.9.0")
-bazel_dep(name = "java_toolchains", version = "0.0.1")
+bazel_dep(name = "jdk_catalog", version = "0.0.1")
 git_override(
-    module_name = "java_toolchains",
-    remote = "https://github.com/davido/java_toolchains.git",
+    module_name = "jdk_catalog",
+    remote = "https://github.com/davido/jdk_catalog.git",
     commit = "5ba7b4f08019bccab1f560f29d1734ed55e3e985",
 )
 ```

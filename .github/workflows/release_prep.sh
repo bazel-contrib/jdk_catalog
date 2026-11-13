@@ -20,7 +20,7 @@ fi
 release_version="${release_tag#v}"
 for module_file in MODULE.bazel examples/consuming/MODULE.bazel; do
   if ! grep -Fq "version = \"${release_version}\"" "$module_file"; then
-    echo "Update the java_toolchains version in ${module_file} to ${release_version}" >&2
+    echo "Update the jdk_catalog version in ${module_file} to ${release_version}" >&2
     exit 1
   fi
 done
@@ -28,14 +28,14 @@ done
 bazelisk build //docs:extensions //docs:repositories >&2
 mkdir -p dist
 git archive --format=tar.gz \
-  --output="dist/java_toolchains-${release_tag}.tar.gz" "$release_tag"
-tar -czf "dist/java_toolchains-${release_tag}.docs.tar.gz" \
+  --output="dist/jdk_catalog-${release_tag}.tar.gz" "$release_tag"
+tar -czf "dist/jdk_catalog-${release_tag}.docs.tar.gz" \
   -C bazel-bin/docs extensions.binaryproto repositories.binaryproto
 
 cat <<EOF
 Non-LTS JDK toolchains for Bazel, built on rules_java.
 
-Install java_toolchains ${release_version} using the source archive attached to
+Install jdk_catalog ${release_version} using the source archive attached to
 this release. A plain bazel_dep is available after this version is admitted
 to the Bazel Central Registry. See README.md for toolchain selection flags
 and the supported platform catalog.

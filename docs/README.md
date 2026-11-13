@@ -7,10 +7,10 @@ Public labels:
 
 | Label | Purpose |
 | --- | --- |
-| `@java_toolchains//toolchains:remotejdk_27` | Java runtime alias for `java_runtime` attributes. |
-| `@java_toolchains//toolchains:toolchain_jdk_27` | Java 27 compilation toolchain. |
+| `@jdk_catalog//toolchains:remotejdk_27` | Java runtime alias for `java_runtime` attributes. |
+| `@jdk_catalog//toolchains:toolchain_jdk_27` | Java 27 compilation toolchain. |
 
-The Starlark extension `@java_toolchains//jdk:extensions.bzl%non_lts_jdks`
+The Starlark extension `@jdk_catalog//jdk:extensions.bzl%non_lts_jdks`
 provides the platform archives and runtime configuration repositories. Its
 `remote_jdk27_repos()` implementation helper is also documented for maintainers;
 consumers do not normally call it directly.

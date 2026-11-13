@@ -1,5 +1,5 @@
 {
-  "homepage": "https://github.com/davido/java_toolchains",
+  "homepage": "https://github.com/davido/jdk_catalog",
   "maintainers": [
     {
       "email": "david@ostrovsky.org",
@@ -7,7 +7,7 @@
       "name": "David Ostrovsky"
     }
   ],
-  "repository": ["github:davido/java_toolchains"],
+  "repository": ["github:davido/jdk_catalog"],
   "versions": [],
   "yanked_versions": {}
 }

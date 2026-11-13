@@ -1,5 +1,5 @@
 module(
-    name = "java_toolchains",
+    name = "jdk_catalog",
     version = "0.0.2-catalog.1",
     bazel_compatibility = [">=9.3.0"],
     compatibility_level = 1,
