@@ -26,18 +26,16 @@ _REMOTE_JDK27_REPOS = [
     "remotejdk27_win",
 ]
 
+# //toolchains defines the runtime, bootstrap and compile toolchains directly
+# against these JDK archives, so the whole set registers through the single
+# //toolchains:all target below (and consumers can do the same under
+# --incompatible_restrict_non_root_registrations, bazel #32428).
 [
-    use_repo(non_lts_jdks, repo + "_toolchain_config_repo")
+    use_repo(non_lts_jdks, repo)
     for repo in _REMOTE_JDK27_REPOS
 ]
 
-# Runtime toolchains, selectable with --java_runtime_version=remotejdk_27 (or 27).
-[
-    register_toolchains("@" + repo + "_toolchain_config_repo//:all")
-    for repo in _REMOTE_JDK27_REPOS
-]
-
-# Compile toolchain that runs javac on JDK 27, selectable with
-# --java_language_version=27. The LTS toolchains in rules_java top out at JDK 25,
-# whose javac rejects source/target 27.
+# Runtime (--java_runtime_version=remotejdk_27 or 27) and compile
+# (--java_language_version=27) toolchains. rules_java's LTS toolchains top out at
+# JDK 25, whose javac rejects source/target 27.
 register_toolchains("//toolchains:all")

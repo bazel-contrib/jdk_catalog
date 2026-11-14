@@ -27,3 +27,118 @@ default_java_toolchain(
     source_version = "27",
     target_version = "27",
 )
+
+# Runtime toolchains, hoisted here from the per-JDK *_toolchain_config_repo
+# repositories that remote_java_repository generates. Keeping them in this
+# package lets a consumer register the whole set -- compile, runtime and
+# bootstrap -- with a single register_toolchains("@jdk_catalog//toolchains:all").
+# That one-liner is required under --incompatible_restrict_non_root_registrations
+# (bazel #32428), where this module's own registrations are ignored because it
+# does not own the Java toolchain types.
+
+# Version selection shared by every runtime toolchain below, matching what
+# remote_java_repository emits: --java_runtime_version=remotejdk_27 (or 27).
+config_setting(
+    name = "prefix_version_setting",
+    values = {"java_runtime_version": "remotejdk_27"},
+    visibility = ["//visibility:private"],
+)
+
+config_setting(
+    name = "version_setting",
+    values = {"java_runtime_version": "27"},
+    visibility = ["//visibility:private"],
+)
+
+alias(
+    name = "version_or_prefix_version_setting",
+    actual = select({
+        ":version_setting": ":version_setting",
+        "//conditions:default": ":prefix_version_setting",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+# (repo, platform constraints); the archive repo exposes the runtime as //:jdk.
+_JDK27_RUNTIMES = [
+    (
+        "remotejdk27_linux",
+        [
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
+        ],
+    ),
+    (
+        "remotejdk27_linux_aarch64",
+        [
+            "@platforms//os:linux",
+            "@platforms//cpu:aarch64",
+        ],
+    ),
+    (
+        "remotejdk27_linux_ppc64le",
+        [
+            "@platforms//os:linux",
+            "@platforms//cpu:ppc64le",
+        ],
+    ),
+    (
+        "remotejdk27_linux_riscv64",
+        [
+            "@platforms//os:linux",
+            "@platforms//cpu:riscv64",
+        ],
+    ),
+    (
+        "remotejdk27_linux_s390x",
+        [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+    ),
+    (
+        "remotejdk27_macos",
+        [
+            "@platforms//os:macos",
+            "@platforms//cpu:x86_64",
+        ],
+    ),
+    (
+        "remotejdk27_macos_aarch64",
+        [
+            "@platforms//os:macos",
+            "@platforms//cpu:aarch64",
+        ],
+    ),
+    (
+        "remotejdk27_win",
+        [
+            "@platforms//os:windows",
+            "@platforms//cpu:x86_64",
+        ],
+    ),
+]
+
+[
+    toolchain(
+        name = repo + "_runtime_toolchain",
+        target_compatible_with = constraints,
+        target_settings = [":version_or_prefix_version_setting"],
+        toolchain = "@" + repo + "//:jdk",
+        toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+    )
+    for repo, constraints in _JDK27_RUNTIMES
+]
+
+# Bootstrap runtime for building the JDK 27 compile toolchain. exec_compatible_with
+# (not target_compatible_with) avoids fetching remote JDKs for other architectures.
+[
+    toolchain(
+        name = repo + "_bootstrap_runtime_toolchain",
+        exec_compatible_with = constraints,
+        target_settings = [":version_or_prefix_version_setting"],
+        toolchain = "@" + repo + "//:jdk",
+        toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+    )
+    for repo, constraints in _JDK27_RUNTIMES
+]
