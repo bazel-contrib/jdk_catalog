@@ -24,6 +24,7 @@ _REMOTE_JDK27_REPOS = [
     "remotejdk27_macos",
     "remotejdk27_macos_aarch64",
     "remotejdk27_win",
+    "remotejdk27_win_arm64",
 ]
 
 # //toolchains defines the runtime, bootstrap and compile toolchains directly

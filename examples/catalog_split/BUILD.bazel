@@ -1,0 +1,9 @@
+load("@rules_java//java:defs.bzl", "java_test")
+
+java_test(
+    name = "runtime_test",
+    size = "small",
+    srcs = ["RuntimeTest.java"],
+    main_class = "RuntimeTest",
+    use_testrunner = False,
+)

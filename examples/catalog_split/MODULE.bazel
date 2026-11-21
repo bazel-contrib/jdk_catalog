@@ -1,0 +1,24 @@
+module(name = "catalog_split_example")
+
+bazel_dep(name = "rules_java", version = "9.9.0")
+bazel_dep(name = "java_tools", version = "23.0-davido.1")
+bazel_dep(name = "jdk_catalog", version = "0.0.2-catalog.1")
+
+# These published split-prototype sources stay fixed during JDK catalog updates.
+git_override(
+    module_name = "rules_java",
+    commit = "a5701dd179685c5373314736e69eef4b48ba2c37",
+    remote = "https://github.com/davido/rules_java.git",
+)
+
+git_override(
+    module_name = "java_tools",
+    commit = "34d71142ce6b94f4434ea42d5fdaeba699e386b8",
+    remote = "https://github.com/davido/java_tools.git",
+)
+
+# Exercise the checked-out catalog, including changes not yet published.
+local_path_override(
+    module_name = "jdk_catalog",
+    path = "../..",
+)

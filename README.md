@@ -13,7 +13,7 @@ machinery and only contributes the archive catalog.
 ## What it provides
 
 - Runtime toolchains for JDK 27 across linux (x86_64/aarch64/ppc64le/riscv64/s390x),
-  macOS (x86_64/aarch64), and Windows (x86_64), selectable with
+  macOS (x86_64/aarch64), and Windows (x86_64/ARM64), selectable with
   `--java_runtime_version=remotejdk_27` (or `=27`).
 - `@jdk_catalog//toolchains:remotejdk_27` — the runtime label, for use
   as a `java_runtime = ...` attribute.
@@ -103,15 +103,44 @@ Apache License 2.0. See [LICENSE](LICENSE).
 
 ## LTS catalog extraction prototype
 
-This branch also provides the LTS catalog extracted from rules_java HEAD
-575fa89, including fmeum's JDK 25.0.5 refresh. The existing JDK 27 toolchains
-and extension API remain available.
+This branch also provides the LTS catalog originally extracted from rules_java
+commit 575fa89. Its Zulu pins now include the November 2026 updates: JDK 8u514,
+11.0.33.1, 17.0.21.1, 21.0.13.1 and 25.0.5.1. The separate non-LTS catalog uses
+Zulu 27.0.1.1 and preserves the existing JDK 27 toolchains and extension API.
+JDK 27 on Windows ARM64 uses BellSoft Liberica 27.0.1.1+5, matching Bazel's
+full JDK archive with `jmods`. Windows x86_64 continues to use Zulu.
+
+The Zulu 17, 21, 25 and 27 updates address
+[CVE-2026-114938](https://support.azul.com/hc/en-us/articles/55793255806100-Java4Shell-for-Zulu-and-Zing-CVE-2026-114938).
+Zulu 8 and 11 are not affected by that issue; their updates are maintenance
+refreshes. Temurin LTS pins use the newest release available for every configured
+architecture: 11.0.33, 17.0.21.1, 21.0.13.1 and 25.0.5. The Microsoft Windows
+ARM64 JDK is 11.0.33.1. The legacy AdoptOpenJDK 8/s390x pin remains at 8u292.
+For JDK 27, Temurin ppc64le and s390x use 27.0.1.1; riscv64 remains at 27.0.1.0.2.
+These non-x86 architectures are not affected by the AVX-512 vulnerability.
 
 `jdk/catalog.bzl` owns pins; `jdk/repositories_util.bzl` owns version and URL
 construction. `bazelisk query //jdk:check_catalog` checks their agreement without
 downloads. `bazelisk build //jdk:catalog_manifest` exports the selected pins.
 
-Regenerate entries with `bazelisk build //jdk:dump_remote_jdk_configs`, then
+Refresh all LTS and non-LTS pins together with:
+
+```sh
+python3 tools/update_jdk_catalog.py --all
+bazelisk query //jdk:check_catalog
+```
+
+Add `--dry-run` to check without changing files, or `--verify-archive-roots` to
+also inspect the archive layouts using partial downloads. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for vendor selection and validation details.
+Only this module needs publishing for a pin refresh in the split installation;
+consumers with `git_override` must advance their `jdk_catalog` commit.
+The [split consumer example](examples/catalog_split/README.md) keeps published
+`rules_java` and `java_tools` commits fixed and checks JDK 25 and 27 patch
+versions using only this catalog checkout.
+
+Alternatively, regenerate LTS entries with
+`bazelisk build //jdk:dump_remote_jdk_configs`, then
 replace the struct entries in `jdk/catalog.bzl` with the generated output and
 rerun the check. Regeneration downloads all configured JDK archives; it is a
 maintainer operation, not a build prerequisite. Do not run it merely to check

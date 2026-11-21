@@ -28,30 +28,30 @@ _JDK27_CONFIGS = [
     struct(
         name = "remotejdk27_linux",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
-        sha256 = "c128817926e4eebb30868b6ba082028f493afa716e459e34049bde0ab49a9829",
-        strip_prefix = "zulu27.30.109-ca-jdk27.0.1.0.3-linux_x64",
+        sha256 = "c4d7bf4c80a21e935187ecdcb111e4b2f14e1fdd18364974fe7f7da54b12bea0",
+        strip_prefix = "zulu27.30.201-ca-jdk27.0.1.1-linux_x64",
         urls = [
-            "https://cdn.azul.com/zulu/bin/zulu27.30.109-ca-jdk27.0.1.0.3-linux_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu27.30.201-ca-jdk27.0.1.1-linux_x64.tar.gz",
         ],
         version = "27",
     ),
     struct(
         name = "remotejdk27_linux_aarch64",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
-        sha256 = "4b4d2fb4a6bff5fa4d3a1f22ac5933c87d83e41d5f78bcd88df878326342d507",
-        strip_prefix = "zulu27.30.109-ca-jdk27.0.1.0.3-linux_aarch64",
+        sha256 = "18875b92ad2535230a13175f718933f7cc0593b4affa2dab442815ec245dacbb",
+        strip_prefix = "zulu27.30.201-ca-jdk27.0.1.1-linux_aarch64",
         urls = [
-            "https://cdn.azul.com/zulu/bin/zulu27.30.109-ca-jdk27.0.1.0.3-linux_aarch64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu27.30.201-ca-jdk27.0.1.1-linux_aarch64.tar.gz",
         ],
         version = "27",
     ),
     struct(
         name = "remotejdk27_macos",
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
-        sha256 = "88cf4b1d04ed677d88e53716fb0c960b89917a0234cea6555ba9aa5d37961b83",
-        strip_prefix = "zulu27.30.109-ca-jdk27.0.1.0.3-macosx_x64",
+        sha256 = "271f8d1bb2f692bdc981799e8f251133c854cc5c1edafa80298a461bb8909dec",
+        strip_prefix = "zulu27.30.201-ca-jdk27.0.1.1-macosx_x64",
         urls = [
-            "https://cdn.azul.com/zulu/bin/zulu27.30.109-ca-jdk27.0.1.0.3-macosx_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu27.30.201-ca-jdk27.0.1.1-macosx_x64.tar.gz",
         ],
         version = "27",
         patch_cmds = ["ln -s Contents/Home/* ."],
@@ -59,10 +59,10 @@ _JDK27_CONFIGS = [
     struct(
         name = "remotejdk27_macos_aarch64",
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
-        sha256 = "88dec2f8609e7c4162778cbaef5437f00febd3c498a7c0e77277d1f4ac8f839d",
-        strip_prefix = "zulu27.30.109-ca-jdk27.0.1.0.3-macosx_aarch64",
+        sha256 = "1d28430a13d257248856792e0131d845cbe324145971df7c9716ec2a92ac0fca",
+        strip_prefix = "zulu27.30.201-ca-jdk27.0.1.1-macosx_aarch64",
         urls = [
-            "https://cdn.azul.com/zulu/bin/zulu27.30.109-ca-jdk27.0.1.0.3-macosx_aarch64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu27.30.201-ca-jdk27.0.1.1-macosx_aarch64.tar.gz",
         ],
         version = "27",
         patch_cmds = ["ln -s Contents/Home/* ."],
@@ -70,20 +70,32 @@ _JDK27_CONFIGS = [
     struct(
         name = "remotejdk27_win",
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
-        sha256 = "70e0aff2bfc1a9468ef464f97c96b295188c15f5a6f7fec3429a4b924b8b338d",
-        strip_prefix = "zulu27.30.109-ca-jdk27.0.1.0.3-win_x64",
+        sha256 = "f5424ea36f832aa28a0441a57ffb1dfe2cd3d903802c0a36d22576b1acc430ec",
+        strip_prefix = "zulu27.30.201-ca-jdk27.0.1.1-win_x64",
         urls = [
-            "https://cdn.azul.com/zulu/bin/zulu27.30.109-ca-jdk27.0.1.0.3-win_x64.zip",
+            "https://cdn.azul.com/zulu/bin/zulu27.30.201-ca-jdk27.0.1.1-win_x64.zip",
+        ],
+        version = "27",
+    ),
+    # Liberica's full Windows ARM64 JDK includes jmods, as required by Bazel's
+    # embedded-JDK cross-jlink build. Keep the same archive/provider here.
+    struct(
+        name = "remotejdk27_win_arm64",
+        target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:arm64"],
+        sha256 = "3f4273f9ecea9ba17ce3d7463cb55cab4446ff1cea25e3577574cc8a6449d245",
+        strip_prefix = "jdk-27.0.1.1",
+        urls = [
+            "https://github.com/bell-sw/Liberica/releases/download/27.0.1.1%2B5/bellsoft-jdk27.0.1.1%2B5-windows-aarch64.zip",
         ],
         version = "27",
     ),
     struct(
         name = "remotejdk27_linux_ppc64le",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc64le"],
-        sha256 = "c0fd2832050eb3320334c8ee0d620ead55651059fd29d41a185d92a459e43fc2",
-        strip_prefix = "jdk-27.0.1.0.2+1",
+        sha256 = "7250ecc091b6b4020918dc084b3ad0ee5e7bd136a52ee9a29e85954147ebb694",
+        strip_prefix = "jdk-27.0.1.1+4",
         urls = [
-            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.0.2+1/OpenJDK27U-jdk_ppc64le_linux_hotspot_27.0.1.0.2_1.tar.gz",
+            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.1+4/OpenJDK27U-jdk_ppc64le_linux_hotspot_27.0.1.1_4.tar.gz",
         ],
         version = "27",
     ),
@@ -100,10 +112,10 @@ _JDK27_CONFIGS = [
     struct(
         name = "remotejdk27_linux_s390x",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:s390x"],
-        sha256 = "6c4e1f13490f1efb38b5f52667f05c433f7c94ae59c7e307a193e94b7b597e26",
-        strip_prefix = "jdk-27.0.1.0.2+1",
+        sha256 = "32950ee8da75cb0472b3c77f3559384ecf2740652c664a9db0f24c3423c0a79f",
+        strip_prefix = "jdk-27.0.1.1+4",
         urls = [
-            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.0.2+1/OpenJDK27U-jdk_s390x_linux_hotspot_27.0.1.0.2_1.tar.gz",
+            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.1+4/OpenJDK27U-jdk_s390x_linux_hotspot_27.0.1.1_4.tar.gz",
         ],
         version = "27",
     ),

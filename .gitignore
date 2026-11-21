@@ -1,5 +1,6 @@
 /bazel-*
 /examples/consuming/bazel-*
+/examples/catalog_split/bazel-*
 MODULE.bazel.lock
 *.swp
 /dist/

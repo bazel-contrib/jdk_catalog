@@ -30,6 +30,6 @@ they do not need to call use_extension or register_toolchains themselves.
 
 Archives are fetched on demand when their toolchains are selected. There are no
 configuration tags. JDK 27 currently covers Linux x86_64, aarch64, ppc64le,
-riscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64.
+riscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64 and ARM64.
 """,
 )
