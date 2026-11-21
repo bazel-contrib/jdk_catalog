@@ -75,6 +75,57 @@ cache can reuse archives across workspaces.
 See the [API reference](docs/README.md), [contributor guide](CONTRIBUTING.md),
 and [release procedure](RELEASING.md).
 
+## Updating the catalogs
+
+The [catalog updater](tools/update_jdk_catalog.py) refreshes the configured
+JDK 8, 11, 17, 21, 25 and 27 archives from vendor metadata. It updates the
+LTS release table and generated pins together, plus the separate JDK 27 pins.
+It supports Azul Zulu, Eclipse Temurin, Microsoft OpenJDK and BellSoft Liberica
+(JDK 27 on Windows ARM64).
+
+Run from the repository root with Python 3.9+ and `curl`. `buildifier` is
+optional; the script uses it when installed.
+
+```sh
+# Check for updates without changing files.
+python3 tools/update_jdk_catalog.py --all --dry-run
+
+# Apply updates and verify archive root directories using partial downloads.
+python3 tools/update_jdk_catalog.py --all --verify-archive-roots
+
+# Check that the LTS pins and their generator inputs agree.
+bazelisk query //jdk:check_catalog
+```
+
+The dry run exits **0** when current, **1** when updates are available, and
+**2** on an error. Checksums come from published vendor metadata; the updater
+does not download full JDK archives. Omitting `--verify-archive-roots` skips
+the optional layout checks; Microsoft and BellSoft ZIP headers are always
+inspected to determine their root directories.
+
+To refresh one release line instead:
+
+```sh
+python3 tools/update_jdk_catalog.py --java-version 25 --verify-archive-roots
+```
+
+With no scope option, the script retains its original JDK 27-only behavior.
+Temurin LTS pins use the newest release available across all configured
+architectures for that major. The legacy AdoptOpenJDK 8/s390x entry is retained
+and reported explicitly. New platforms or JDK majors still need registration
+changes. Review the diff and arrange any missing LTS archive mirroring before
+publication; the script does not publish artifacts or modules.
+
+In the three-module split, a JDK pin refresh requires publishing only
+`jdk_catalog`: the existing `rules_java` split fork and `java_tools` module
+can stay fixed. Consumers using `git_override` must advance their
+`jdk_catalog` commit to adopt the refresh. Vanilla upstream `rules_java` does
+not consume this external LTS catalog. The
+[split consumer example](examples/catalog_split/README.md) demonstrates JDK 25
+and 27 compilation and execution with both companion module commits fixed.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for updater regression tests and further
+validation steps.
+
 ## Maintenance and support
 
 David Ostrovsky ([@davido](https://github.com/davido)) maintains this project
@@ -123,21 +174,8 @@ These non-x86 architectures are not affected by the AVX-512 vulnerability.
 construction. `bazelisk query //jdk:check_catalog` checks their agreement without
 downloads. `bazelisk build //jdk:catalog_manifest` exports the selected pins.
 
-Refresh all LTS and non-LTS pins together with:
-
-```sh
-python3 tools/update_jdk_catalog.py --all
-bazelisk query //jdk:check_catalog
-```
-
-Add `--dry-run` to check without changing files, or `--verify-archive-roots` to
-also inspect the archive layouts using partial downloads. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for vendor selection and validation details.
-Only this module needs publishing for a pin refresh in the split installation;
-consumers with `git_override` must advance their `jdk_catalog` commit.
-The [split consumer example](examples/catalog_split/README.md) keeps published
-`rules_java` and `java_tools` commits fixed and checks JDK 25 and 27 patch
-versions using only this catalog checkout.
+Use the [catalog updater](#updating-the-catalogs) to refresh the LTS and non-LTS
+pins together from vendor metadata.
 
 Alternatively, regenerate LTS entries with
 `bazelisk build //jdk:dump_remote_jdk_configs`, then
