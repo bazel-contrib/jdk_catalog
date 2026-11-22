@@ -10,12 +10,14 @@ load(
 
 package(default_visibility = ["//visibility:public"])
 
-# Runtime label, usable as java_runtime = "@jdk_catalog//toolchains:remotejdk_27"
-# and as --java_runtime_version=remotejdk_27.
-java_runtime_version_alias(
-    name = "remotejdk_27",
-    runtime_version = "remotejdk_27",
-)
+# Runtime aliases share rules_java's selection machinery for both JDK versions.
+[java_runtime_version_alias(
+    name = "remotejdk_" + version,
+    runtime_version = "remotejdk_" + version,
+) for version in [
+    "25",
+    "27",
+]]
 
 # The LTS toolchains in rules_java top out at JDK 25, whose javac rejects
 # source/target 27. Run javac on JDK 27 for the 27 language version without

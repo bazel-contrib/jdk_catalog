@@ -7,7 +7,8 @@ Public labels:
 
 | Label | Purpose |
 | --- | --- |
-| `@jdk_catalog//toolchains:remotejdk_27` | Java runtime alias for `java_runtime` attributes. |
+| `@jdk_catalog//toolchains:remotejdk_25` | Java 25 runtime alias using rules_java runtime registrations. |
+| `@jdk_catalog//toolchains:remotejdk_27` | Java 27 runtime alias for `java_runtime` attributes. |
 | `@jdk_catalog//toolchains:toolchain_jdk_27` | Java 27 compilation toolchain. |
 
 The Starlark extension `@jdk_catalog//jdk:extensions.bzl%non_lts_jdks`

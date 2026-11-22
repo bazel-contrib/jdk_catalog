@@ -15,8 +15,10 @@ machinery and only contributes the archive catalog.
 - Runtime toolchains for JDK 27 across linux (x86_64/aarch64/ppc64le/riscv64/s390x),
   macOS (x86_64/aarch64), and Windows (x86_64/ARM64), selectable with
   `--java_runtime_version=remotejdk_27` (or `=27`).
-- `@jdk_catalog//toolchains:remotejdk_27` — the runtime label, for use
-  as a `java_runtime = ...` attribute.
+- `@jdk_catalog//toolchains:remotejdk_25` and `remotejdk_27` — runtime aliases
+  for `java_runtime` attributes. Both use `rules_java`'s runtime selection
+  machinery; JDK 25 uses its existing runtime registrations. The catalog-split
+  fork of `rules_java` reads JDK 25 archive pins from this module.
 - `@jdk_catalog//toolchains:toolchain_jdk_27` — a compile toolchain that
   runs `javac` on JDK 27, selectable with `--java_language_version=27`. (The LTS
   toolchains top out at JDK 25, whose `javac` rejects source/target 27.)
