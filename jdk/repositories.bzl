@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Remote JDK repositories for non-LTS releases (currently JDK 27).
+"""Remote JDK repositories for JDK 25 and 27.
 
 These reuse rules_java's remote_java_repository macro to import the JDK archive
 and generate the runtime toolchain definitions; this module only carries the
@@ -21,6 +21,9 @@ catalog of archives.
 
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@rules_java//toolchains:remote_java_repository.bzl", "remote_java_repository")
+load(":catalog.bzl", "REMOTE_JDK_CONFIGS_LIST")
+
+JDK25_CONFIGS = [cfg for cfg in REMOTE_JDK_CONFIGS_LIST if cfg.version == "25"]
 
 # Zulu Community builds (linux/macos/windows) plus Adoptium Temurin for the
 # architectures Azul does not publish (ppc64le, riscv64, s390x).
@@ -121,9 +124,18 @@ _JDK27_CONFIGS = [
     ),
 ]
 
+JDK27_CONFIGS = _JDK27_CONFIGS
+
+def remote_jdk25_repos():
+    """Imports JDK 25 archives from this module's LTS catalog."""
+    _remote_jdk_repos(JDK25_CONFIGS)
+
 def remote_jdk27_repos():
     """Imports the OpenJDK 27 archives and their runtime toolchain definitions."""
-    for item in _JDK27_CONFIGS:
+    _remote_jdk_repos(JDK27_CONFIGS)
+
+def _remote_jdk_repos(configs):
+    for item in configs:
         maybe(
             remote_java_repository,
             name = item.name,

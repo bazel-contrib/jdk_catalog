@@ -2,8 +2,12 @@
 starlark_doc_extract(
     name = "extensions",
     src = "//jdk:extensions.bzl",
-    symbol_names = ["non_lts_jdks"],
+    symbol_names = [
+        "jdks",
+        "non_lts_jdks",
+    ],
     deps = [
+        "//jdk:catalog.bzl",
         "//jdk:repositories.bzl",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
         "@bazel_tools//tools/build_defs/repo:http.bzl",
@@ -15,8 +19,12 @@ starlark_doc_extract(
 starlark_doc_extract(
     name = "repositories",
     src = "//jdk:repositories.bzl",
-    symbol_names = ["remote_jdk27_repos"],
+    symbol_names = [
+        "remote_jdk25_repos",
+        "remote_jdk27_repos",
+    ],
     deps = [
+        "//jdk:catalog.bzl",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
         "@bazel_tools//tools/build_defs/repo:http.bzl",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",

@@ -12,9 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module extension that instantiates the non-LTS remote JDK repositories."""
+"""Module extensions that instantiate catalog-owned JDK repositories."""
 
-load("//jdk:repositories.bzl", "remote_jdk27_repos")
+load("//jdk:repositories.bzl", "remote_jdk25_repos", "remote_jdk27_repos")
+
+def _jdks_impl(module_ctx):
+    remote_jdk25_repos()
+    remote_jdk27_repos()
+    return module_ctx.extension_metadata(reproducible = True)
+
+jdks = module_extension(
+    implementation = _jdks_impl,
+    doc = """Provides JDK 25 and 27 archive and runtime-configuration repositories.
+
+The jdk_catalog module uses this extension internally. Consumers register
+@jdk_catalog//toolchains:all in their root module to prefer these JDKs over
+rules_java's bundled runtime registrations. The rules_java implementation and
+java_tools release do not need to change when catalog pins are refreshed.
+
+Archives are fetched on demand. There are no configuration tags. Both versions
+cover Linux x86_64, aarch64, ppc64le, riscv64 and s390x; macOS x86_64 and aarch64;
+and Windows x86_64 and ARM64. Patch versions can differ across architectures.
+""",
+)
 
 def _non_lts_jdks_impl(module_ctx):
     remote_jdk27_repos()
@@ -22,14 +42,10 @@ def _non_lts_jdks_impl(module_ctx):
 
 non_lts_jdks = module_extension(
     implementation = _non_lts_jdks_impl,
-    doc = """Provides the non-LTS JDK archive and runtime-configuration repositories.
+    doc = """Compatibility extension providing only JDK 27 repositories.
 
-The jdk_catalog module uses this extension and registers the runtime and
-compilation toolchains automatically. Consumers normally need only bazel_dep;
-they do not need to call use_extension or register_toolchains themselves.
-
-Archives are fetched on demand when their toolchains are selected. There are no
-configuration tags. JDK 27 currently covers Linux x86_64, aarch64, ppc64le,
-riscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64 and ARM64.
+Existing direct users can retain this extension. The jdk_catalog module now
+uses jdks internally to supply both JDK 25 and 27. Repositories are fetched on
+demand and no configuration tags are supported.
 """,
 )

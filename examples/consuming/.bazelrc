@@ -2,3 +2,8 @@ build:java27 --java_language_version=27
 build:java27 --java_runtime_version=remotejdk_27
 build:java27 --tool_java_language_version=27
 build:java27 --tool_java_runtime_version=remotejdk_27
+
+build:java25 --java_language_version=25
+build:java25 --java_runtime_version=remotejdk_25
+build:java25 --tool_java_language_version=25
+build:java25 --tool_java_runtime_version=remotejdk_25

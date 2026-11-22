@@ -1,27 +1,22 @@
 # jdk_catalog
 
-Non-LTS JDK toolchains for Bazel, packaged as a standalone bzlmod module on top
-of [`rules_java`](https://github.com/bazelbuild/rules_java).
+JDK archive pins and toolchains for Bazel, packaged as a standalone Bzlmod module
+using upstream [`rules_java`](https://github.com/bazelbuild/rules_java).
 
-`rules_java` ships remote JDK toolchains for the LTS line (8, 11, 17, 21, 25) and
-is deliberately conservative about carrying non-LTS releases, since each one is
-only supported for six months. This module adds those short-lived releases
-(currently **JDK 27**) without forking `rules_java`: it reuses `rules_java`'s own
-`remote_java_repository`, `default_java_toolchain`, and `java_runtime_version_alias`
-machinery and only contributes the archive catalog.
+This module supplies JDK 25 and 27 directly from its own archive catalogs. It
+reuses `rules_java`'s repository and toolchain implementations; neither a
+`rules_java` fork nor a separate `java_tools` module is required. Refreshing JDK
+pins does not require releasing either of those projects.
 
 ## What it provides
 
-- Runtime toolchains for JDK 27 across linux (x86_64/aarch64/ppc64le/riscv64/s390x),
-  macOS (x86_64/aarch64), and Windows (x86_64/ARM64), selectable with
-  `--java_runtime_version=remotejdk_27` (or `=27`).
+- Runtime, bootstrap and compilation toolchains for JDK 25 and 27 across Linux
+  (x86_64/aarch64/ppc64le/riscv64/s390x), macOS (x86_64/aarch64), and Windows
+  (x86_64/ARM64). Patch versions can differ across architectures.
 - `@jdk_catalog//toolchains:remotejdk_25` and `remotejdk_27` — runtime aliases
-  for `java_runtime` attributes. Both use `rules_java`'s runtime selection
-  machinery; JDK 25 uses its existing runtime registrations. The catalog-split
-  fork of `rules_java` reads JDK 25 archive pins from this module.
-- `@jdk_catalog//toolchains:toolchain_jdk_27` — a compile toolchain that
-  runs `javac` on JDK 27, selectable with `--java_language_version=27`. (The LTS
-  toolchains top out at JDK 25, whose `javac` rejects source/target 27.)
+  for `java_runtime` attributes, using catalog-owned archives.
+- `@jdk_catalog//toolchains:toolchain_jdk_25` and `toolchain_jdk_27` — compilation
+  toolchains for their respective Java language versions.
 
 ## Usage
 
@@ -32,16 +27,28 @@ For now, add a Git override pinned to a commit whose module name is
 ```starlark
 # MODULE.bazel
 bazel_dep(name = "rules_java", version = "9.9.0")
-bazel_dep(name = "jdk_catalog", version = "0.0.1")
+bazel_dep(name = "jdk_catalog", version = "0.0.2-catalog.1")
 git_override(
     module_name = "jdk_catalog",
     remote = "https://github.com/davido/jdk_catalog.git",
-    commit = "5ba7b4f08019bccab1f560f29d1734ed55e3e985",
+    commit = "<catalog-commit>",
 )
+
+# Root registrations take precedence over rules_java's bundled JDKs.
+register_toolchains("@jdk_catalog//toolchains:all")
 ```
+
+Replace `<catalog-commit>` with the catalog revision to consume. Registering
+from the root is required to prefer this catalog's JDK 25 over upstream
+`rules_java`'s JDK 25, and supports restricted non-root registrations.
 
 ```
 # .bazelrc
+build:java25 --java_language_version=25
+build:java25 --java_runtime_version=remotejdk_25
+build:java25 --tool_java_language_version=25
+build:java25 --tool_java_runtime_version=remotejdk_25
+
 build:java27 --java_language_version=27
 build:java27 --java_runtime_version=remotejdk_27
 build:java27 --tool_java_language_version=27
@@ -65,7 +72,15 @@ bazelisk run --config=java27 //:hello   # prints "Hello from JDK 27"
 bazelisk test --config=java27 //:toolchain_test
 ```
 
-The test checks JDK 27 execution and Java 27 bytecode. The CI workflow covers
+The test checks JDK execution and the corresponding class-file version.
+Pass an expected patch version to check it explicitly:
+
+```sh
+bazelisk test --config=java25 --test_arg=25.0.5.1 //:toolchain_test
+bazelisk test --config=java27 --test_arg=27.0.1.1 //:toolchain_test
+```
+
+Without an argument, the test retains its JDK 27 major-version check. The CI workflow covers
 Linux x86_64, macOS aarch64, and Windows x86_64 with Bazel 9.3.0, the minimum
 supported version.
 The remaining catalog architectures are not covered by that workflow.
@@ -154,9 +169,9 @@ public labels follows the versioning policy in [RELEASING.md](RELEASING.md).
 
 Apache License 2.0. See [LICENSE](LICENSE).
 
-## LTS catalog extraction prototype
+## Catalog data and the split prototype
 
-This branch also provides the LTS catalog originally extracted from rules_java
+The LTS catalog was originally extracted from rules_java
 commit 575fa89. Its Zulu pins now include the November 2026 updates: JDK 8u514,
 11.0.33.1, 17.0.21.1, 21.0.13.1 and 25.0.5.1. The separate non-LTS catalog uses
 Zulu 27.0.1.1 and preserves the existing JDK 27 toolchains and extension API.
@@ -186,7 +201,10 @@ rerun the check. Regeneration downloads all configured JDK archives; it is a
 maintainer operation, not a build prerequisite. Do not run it merely to check
 the catalog. The original rules_java generator label forwards here.
 
-The rules_java fork reads this catalog through a normal module dependency.
+The JDK 25 extension reads `jdk/catalog.bzl` directly, so ordinary consumers
+use upstream `rules_java` and need no split prototype. The other LTS majors
+remain pin data for the optional catalog-split prototype, whose `rules_java`
+fork reads this catalog through a normal module dependency.
 Module dependency cycles are supported by Bzlmod: this module continues using
 rules_java's toolchain APIs while its pure catalog file has no loads back into
 rules_java. All prototype consumers must pin the fork using a git override.

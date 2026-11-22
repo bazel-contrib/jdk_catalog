@@ -1,8 +1,15 @@
-module_docstring: "Module extension that instantiates the non-LTS remote JDK repositories."
+module_docstring: "Module extensions that instantiate catalog-owned JDK repositories."
 file: "//jdk:extensions.bzl"
 module_extension_info {
+  extension_name: "jdks"
+  doc_string: "Provides JDK 25 and 27 archive and runtime-configuration repositories.\n\nThe jdk_catalog module uses this extension internally. Consumers register\n@jdk_catalog//toolchains:all in their root module to prefer these JDKs over\nrules_java\'s bundled runtime registrations. The rules_java implementation and\njava_tools release do not need to change when catalog pins are refreshed.\n\nArchives are fetched on demand. There are no configuration tags. Both versions\ncover Linux x86_64, aarch64, ppc64le, riscv64 and s390x; macOS x86_64 and aarch64;\nand Windows x86_64 and ARM64. Patch versions can differ across architectures."
+  origin_key {
+    file: "//jdk:extensions.bzl"
+  }
+}
+module_extension_info {
   extension_name: "non_lts_jdks"
-  doc_string: "Provides the non-LTS JDK archive and runtime-configuration repositories.\n\nThe jdk_catalog module uses this extension and registers the runtime and\ncompilation toolchains automatically. Consumers normally need only bazel_dep;\nthey do not need to call use_extension or register_toolchains themselves.\n\nArchives are fetched on demand when their toolchains are selected. There are no\nconfiguration tags. JDK 27 currently covers Linux x86_64, aarch64, ppc64le,\nriscv64 and s390x; macOS x86_64 and aarch64; and Windows x86_64 and ARM64."
+  doc_string: "Compatibility extension providing only JDK 27 repositories.\n\nExisting direct users can retain this extension. The jdk_catalog module now\nuses jdks internally to supply both JDK 25 and 27. Repositories are fetched on\ndemand and no configuration tags are supported."
   origin_key {
     file: "//jdk:extensions.bzl"
   }

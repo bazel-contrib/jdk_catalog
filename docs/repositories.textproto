@@ -1,4 +1,12 @@
 func_info {
+  function_name: "remote_jdk25_repos"
+  doc_string: "Imports JDK 25 archives from this module\'s LTS catalog."
+  origin_key {
+    name: "remote_jdk25_repos"
+    file: "//jdk:repositories.bzl"
+  }
+}
+func_info {
   function_name: "remote_jdk27_repos"
   doc_string: "Imports the OpenJDK 27 archives and their runtime toolchain definitions."
   origin_key {
@@ -6,5 +14,5 @@ func_info {
     file: "//jdk:repositories.bzl"
   }
 }
-module_docstring: "Remote JDK repositories for non-LTS releases (currently JDK 27).\n\nThese reuse rules_java\'s remote_java_repository macro to import the JDK archive\nand generate the runtime toolchain definitions; this module only carries the\ncatalog of archives."
+module_docstring: "Remote JDK repositories for JDK 25 and 27.\n\nThese reuse rules_java\'s remote_java_repository macro to import the JDK archive\nand generate the runtime toolchain definitions; this module only carries the\ncatalog of archives."
 file: "//jdk:repositories.bzl"

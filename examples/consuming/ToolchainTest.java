@@ -16,11 +16,14 @@ package hello;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-/** Verifies that the consuming module selects Java 27 compilation and execution. */
+/** Verifies the selected JDK runtime and matching Java class-file version. */
 public class ToolchainTest {
   public static void main(String[] args) throws IOException {
-    if (Runtime.version().feature() != 27) {
-      throw new AssertionError("Expected JDK 27 runtime, got " + Runtime.version());
+    Runtime.Version expected = Runtime.Version.parse(args.length == 0 ? "27" : args[0]);
+    if (Runtime.version().feature() != expected.feature()
+        || (expected.version().size() > 1
+            && !Runtime.version().version().equals(expected.version()))) {
+      throw new AssertionError("Expected JDK " + expected + " runtime, got " + Runtime.version());
     }
     try (var in =
         new DataInputStream(ToolchainTest.class.getResourceAsStream("ToolchainTest.class"))) {
@@ -29,8 +32,9 @@ public class ToolchainTest {
       }
       in.readUnsignedShort(); // Minor version.
       int major = in.readUnsignedShort();
-      if (major != 71) { // Java 27 class file version.
-        throw new AssertionError("Expected Java 27 bytecode (71), got " + major);
+      int expectedMajor = expected.feature() + 44;
+      if (major != expectedMajor) {
+        throw new AssertionError("Expected class-file version " + expectedMajor + ", got " + major);
       }
     }
   }

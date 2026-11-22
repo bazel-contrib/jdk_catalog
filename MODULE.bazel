@@ -5,38 +5,32 @@ module(
     compatibility_level = 1,
 )
 
-# The toolchain machinery (remote_java_repository, default_java_toolchain,
-# java_runtime_version_alias) lives in rules_java; this module only adds the
-# JDK 27 toolchains on top of it; jdk/catalog.bzl additionally supplies the
-# LTS pin catalog consumed by the rules_java catalog-split prototype.
+# Reuse upstream rules_java's repository and toolchain implementations.
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "platforms", version = "1.1.0")
 
-non_lts_jdks = use_extension("//jdk:extensions.bzl", "non_lts_jdks")
+jdks = use_extension("//jdk:extensions.bzl", "jdks")
 
-# Keep in sync with the catalog in jdk/repositories.bzl.
-_REMOTE_JDK27_REPOS = [
-    "remotejdk27_linux",
-    "remotejdk27_linux_aarch64",
-    "remotejdk27_linux_ppc64le",
-    "remotejdk27_linux_riscv64",
-    "remotejdk27_linux_s390x",
-    "remotejdk27_macos",
-    "remotejdk27_macos_aarch64",
-    "remotejdk27_win",
-    "remotejdk27_win_arm64",
-]
-
-# //toolchains defines the runtime, bootstrap and compile toolchains directly
-# against these JDK archives, so the whole set registers through the single
-# //toolchains:all target below (and consumers can do the same under
-# --incompatible_restrict_non_root_registrations, bazel #32428).
+# Keep platform names in sync with jdk/catalog.bzl and jdk/repositories.bzl.
 [
-    use_repo(non_lts_jdks, repo)
-    for repo in _REMOTE_JDK27_REPOS
+    use_repo(jdks, "remotejdk" + version + "_" + platform)
+    for version in [
+        "25",
+        "27",
+    ]
+    for platform in [
+        "linux",
+        "linux_aarch64",
+        "linux_ppc64le",
+        "linux_riscv64",
+        "linux_s390x",
+        "macos",
+        "macos_aarch64",
+        "win",
+        "win_arm64",
+    ]
 ]
 
-# Runtime (--java_runtime_version=remotejdk_27 or 27) and compile
-# (--java_language_version=27) toolchains. rules_java's LTS toolchains top out at
-# JDK 25, whose javac rejects source/target 27.
+# Root consumers also register this target to prefer these toolchains over
+# rules_java's registrations and support restricted non-root registrations.
 register_toolchains("//toolchains:all")

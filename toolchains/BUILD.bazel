@@ -7,147 +7,67 @@ load(
     "@rules_java//toolchains:java_toolchain_alias.bzl",
     "java_runtime_version_alias",
 )
+load("//jdk:repositories.bzl", "JDK25_CONFIGS", "JDK27_CONFIGS")
 
 package(default_visibility = ["//visibility:public"])
 
-# Runtime aliases share rules_java's selection machinery for both JDK versions.
+_JDK_VERSIONS = [
+    "25",
+    "27",
+]
+
+_JDK_CONFIGS = JDK25_CONFIGS + JDK27_CONFIGS
+
 [java_runtime_version_alias(
     name = "remotejdk_" + version,
     runtime_version = "remotejdk_" + version,
-) for version in [
-    "25",
-    "27",
-]]
+) for version in _JDK_VERSIONS]
 
-# The LTS toolchains in rules_java top out at JDK 25, whose javac rejects
-# source/target 27. Run javac on JDK 27 for the 27 language version without
-# touching the compiler JDK used for older language versions.
-default_java_toolchain(
-    name = "toolchain_jdk_27",
+[default_java_toolchain(
+    name = "toolchain_jdk_" + version,
     configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
-    java_runtime = ":remotejdk_27",
-    source_version = "27",
-    target_version = "27",
-)
+    java_runtime = ":remotejdk_" + version,
+    source_version = version,
+    target_version = version,
+) for version in _JDK_VERSIONS]
 
-# Runtime toolchains, hoisted here from the per-JDK *_toolchain_config_repo
-# repositories that remote_java_repository generates. Keeping them in this
-# package lets a consumer register the whole set -- compile, runtime and
-# bootstrap -- with a single register_toolchains("@jdk_catalog//toolchains:all").
-# That one-liner is required under --incompatible_restrict_non_root_registrations
-# (bazel #32428), where this module's own registrations are ignored because it
-# does not own the Java toolchain types.
-
-# Version selection shared by every runtime toolchain below, matching what
-# remote_java_repository emits: --java_runtime_version=remotejdk_27 (or 27).
-config_setting(
-    name = "prefix_version_setting",
-    values = {"java_runtime_version": "remotejdk_27"},
+# Match remote_java_repository's prefixed and numeric runtime selectors.
+[config_setting(
+    name = "prefix_version_setting_" + version,
+    values = {"java_runtime_version": "remotejdk_" + version},
     visibility = ["//visibility:private"],
-)
+) for version in _JDK_VERSIONS]
 
-config_setting(
-    name = "version_setting",
-    values = {"java_runtime_version": "27"},
+[config_setting(
+    name = "version_setting_" + version,
+    values = {"java_runtime_version": version},
     visibility = ["//visibility:private"],
-)
+) for version in _JDK_VERSIONS]
 
-alias(
-    name = "version_or_prefix_version_setting",
+[alias(
+    name = "version_or_prefix_version_setting_" + version,
     actual = select({
-        ":version_setting": ":version_setting",
-        "//conditions:default": ":prefix_version_setting",
+        ":version_setting_" + version: ":version_setting_" + version,
+        "//conditions:default": ":prefix_version_setting_" + version,
     }),
     visibility = ["//visibility:private"],
-)
+) for version in _JDK_VERSIONS]
 
-# (repo, platform constraints); the archive repo exposes the runtime as //:jdk.
-_JDK27_RUNTIMES = [
-    (
-        "remotejdk27_linux",
-        [
-            "@platforms//os:linux",
-            "@platforms//cpu:x86_64",
-        ],
-    ),
-    (
-        "remotejdk27_linux_aarch64",
-        [
-            "@platforms//os:linux",
-            "@platforms//cpu:aarch64",
-        ],
-    ),
-    (
-        "remotejdk27_linux_ppc64le",
-        [
-            "@platforms//os:linux",
-            "@platforms//cpu:ppc64le",
-        ],
-    ),
-    (
-        "remotejdk27_linux_riscv64",
-        [
-            "@platforms//os:linux",
-            "@platforms//cpu:riscv64",
-        ],
-    ),
-    (
-        "remotejdk27_linux_s390x",
-        [
-            "@platforms//os:linux",
-            "@platforms//cpu:s390x",
-        ],
-    ),
-    (
-        "remotejdk27_macos",
-        [
-            "@platforms//os:macos",
-            "@platforms//cpu:x86_64",
-        ],
-    ),
-    (
-        "remotejdk27_macos_aarch64",
-        [
-            "@platforms//os:macos",
-            "@platforms//cpu:aarch64",
-        ],
-    ),
-    (
-        "remotejdk27_win",
-        [
-            "@platforms//os:windows",
-            "@platforms//cpu:x86_64",
-        ],
-    ),
-    (
-        "remotejdk27_win_arm64",
-        [
-            "@platforms//os:windows",
-            "@platforms//cpu:arm64",
-        ],
-    ),
-]
+# Root consumers register compile, runtime and bootstrap toolchains together.
+# Derive platform constraints from the same records that supply the archives.
+[toolchain(
+    name = cfg.name + "_runtime_toolchain",
+    target_compatible_with = cfg.target_compatible_with,
+    target_settings = [":version_or_prefix_version_setting_" + cfg.version],
+    toolchain = "@" + cfg.name + "//:jdk",
+    toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+) for cfg in _JDK_CONFIGS]
 
-[
-    toolchain(
-        name = repo + "_runtime_toolchain",
-        target_compatible_with = constraints,
-        target_settings = [":version_or_prefix_version_setting"],
-        toolchain = "@" + repo + "//:jdk",
-        toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
-    )
-    for repo, constraints in _JDK27_RUNTIMES
-]
-
-# Bootstrap runtime for building the JDK 27 compile toolchain. exec_compatible_with
-# (not target_compatible_with) avoids fetching remote JDKs for other architectures.
-[
-    toolchain(
-        name = repo + "_bootstrap_runtime_toolchain",
-        exec_compatible_with = constraints,
-        target_settings = [":version_or_prefix_version_setting"],
-        toolchain = "@" + repo + "//:jdk",
-        toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
-    )
-    for repo, constraints in _JDK27_RUNTIMES
-]
+# Execution constraints avoid fetching other architectures for bootstrapping.
+[toolchain(
+    name = cfg.name + "_bootstrap_runtime_toolchain",
+    exec_compatible_with = cfg.target_compatible_with,
+    target_settings = [":version_or_prefix_version_setting_" + cfg.version],
+    toolchain = "@" + cfg.name + "//:jdk",
+    toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+) for cfg in _JDK_CONFIGS]

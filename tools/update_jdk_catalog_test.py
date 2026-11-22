@@ -49,19 +49,34 @@ PINS = '''REMOTE_JDK_CONFIGS_LIST = [
 
 
 class UpdateJdkCatalogTest(unittest.TestCase):
-    def test_non_lts_pins_module_imports_and_toolchains_cover_same_platforms(self):
+    def test_catalog_pins_and_module_imports_cover_same_platforms(self):
         root = Path(__file__).resolve().parents[1]
-        pins = updater.assignment((root / "jdk/repositories.bzl").read_text(), "_JDK27_CONFIGS")
-        pin_names = {next(updater.ast.literal_eval(k.value) for k in pin.keywords
-                          if k.arg == "name") for pin in pins.elts}
-        imported = updater.ast.literal_eval(updater.assignment(
-            (root / "MODULE.bazel").read_text(), "_REMOTE_JDK27_REPOS"))
-        runtimes = dict(updater.ast.literal_eval(updater.assignment(
-            (root / "toolchains/BUILD.bazel").read_text(), "_JDK27_RUNTIMES")))
-        self.assertEqual(pin_names, set(imported))
-        self.assertEqual(pin_names, runtimes.keys())
-        self.assertEqual(runtimes["remotejdk27_win_arm64"],
-                         ["@platforms//os:windows", "@platforms//cpu:arm64"])
+        module = updater.ast.parse((root / "MODULE.bazel").read_text())
+        imports = next(node.value for node in module.body
+                       if isinstance(node, updater.ast.Expr)
+                       and isinstance(node.value, updater.ast.ListComp)
+                       and isinstance(node.value.elt, updater.ast.Call)
+                       and node.value.elt.func.id == "use_repo")
+        versions, platforms = [updater.ast.literal_eval(g.iter)
+                               for g in imports.generators]
+        imported = {"remotejdk" + v + "_" + platform
+                    for v in versions for platform in platforms}
+        expected = set()
+        for path, variable, version in [
+            ("jdk/catalog.bzl", "REMOTE_JDK_CONFIGS_LIST", "25"),
+            ("jdk/repositories.bzl", "_JDK27_CONFIGS", "27"),
+        ]:
+            pins = updater.assignment((root / path).read_text(), variable)
+            configs = [{k.arg: updater.ast.literal_eval(k.value)
+                        for k in pin.keywords} for pin in pins.elts]
+            configs = [cfg for cfg in configs if cfg["version"] == version]
+            self.assertEqual(len(configs), len(platforms))
+            expected.update(cfg["name"] for cfg in configs)
+            windows_arm64 = next(cfg for cfg in configs
+                                 if cfg["name"] == "remotejdk" + version + "_win_arm64")
+            self.assertEqual(windows_arm64["target_compatible_with"],
+                             ["@platforms//os:windows", "@platforms//cpu:arm64"])
+        self.assertEqual(imported, expected)
 
     def test_bellsoft_uses_full_ga_jdk_and_published_sha256(self):
         builds = [

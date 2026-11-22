@@ -31,6 +31,9 @@ jobs:
         run: bazelisk build //docs:extensions //docs:repositories
       - name: Check generated API reference
         run: python tools/check_api_docs.py
+      - name: Verify Java 25 compiler and runtime
+        working-directory: examples/consuming
+        run: bazelisk test --config=java25 --test_arg=25 --test_output=errors //:toolchain_test
       - name: Verify Java 27 compiler and runtime
         working-directory: examples/consuming
         run: bazelisk test --config=java27 --test_output=errors //:toolchain_test

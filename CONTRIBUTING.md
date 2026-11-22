@@ -62,12 +62,15 @@ Run the integration test in the separate consuming module:
 
 ```sh
 cd examples/consuming
+bazelisk test --config=java25 --test_arg=25 --test_output=errors //:toolchain_test
 bazelisk test --config=java27 --test_output=errors //:toolchain_test
 bazelisk test --config=java27 --java_runtime_version=27 --test_output=errors //:toolchain_test
 bazelisk run --config=java27 //:hello
 ```
 
-The test verifies both JDK 27 execution and Java 27 class-file output. CI runs
+The test verifies JDK execution and the matching Java class-file output.
+An explicit test argument also checks the JDK patch version. Root toolchain
+registration makes the selected JDK 25 independent of upstream rules_java pins. CI runs
 these commands on Linux, macOS, and Windows with Bazel 9.3.0. Other
 catalog architectures need validation on corresponding hosts or remote workers.
 
