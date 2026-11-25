@@ -22,7 +22,11 @@ jobs:
       id-token: write
       attestations: write
       contents: write
-    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@1d798ff015ed0696433e01e2c3ccbb2abefadad7 # v7.7.0
+    # Reference by tag, not a pinned commit SHA: the release build's SLSA
+    # provenance records this ref, and BCR's attestation verification rejects a
+    # bare SHA ("unexpected ref type"). rules_java/rules_go tag-pin it for the
+    # same reason. Renovate is told to keep this unpinned in renovate.json.
+    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.7.0
     with:
       tag_name: ${{ inputs.tag_name || github.ref_name }}
       prerelease: false
