@@ -5,6 +5,11 @@
       "email": "david@ostrovsky.org",
       "github": "davido",
       "name": "David Ostrovsky"
+    },
+    {
+      "email": "katre@henchmonkey.org",
+      "github": "katre",
+      "name": "John Cater"
     }
   ],
   "repository": ["github:bazel-contrib/jdk_catalog"],
