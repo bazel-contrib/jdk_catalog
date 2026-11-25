@@ -1,15 +1,16 @@
-# Enable publication manually after the first release has been reviewed.
+# Submit a published release to the Bazel Central Registry. Runs automatically
+# when a GitHub release is published (see the Prepare release workflow), and can
+# be dispatched manually against an existing tag to retry. Follows the
+# bazel-contrib/rules_jvm_external release-triggered publication pattern.
 name: Publish to BCR
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag_name:
-        description: Published release tag, e.g. v0.0.1
-        required: true
-        type: string
-      registry_fork:
-        description: Writable BCR fork, e.g. davido/bazel-central-registry
+        description: Published release tag, e.g. v0.1.0
         required: true
         type: string
 
@@ -23,8 +24,8 @@ jobs:
       attestations: write
     uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@1ae09341a6014e9bea052879c42392ac6b8b632c # v1.7.0
     with:
-      tag_name: ${{ inputs.tag_name }}
-      registry_fork: ${{ inputs.registry_fork }}
+      tag_name: ${{ github.event.release.tag_name || inputs.tag_name }}
+      registry_fork: bazel-contrib/bazel-central-registry
       draft: true
       attest: true
     secrets:
