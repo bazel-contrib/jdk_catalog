@@ -22,7 +22,7 @@ jobs:
       USE_BAZEL_VERSION: ${{ matrix.bazel }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: bazel-contrib/setup-bazel@4fd964a13a440a8aeb0be47350db2fc640f19ca8 # 0.15.0
+      - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
         with:
           bazelisk-cache: true
           repository-cache: true
