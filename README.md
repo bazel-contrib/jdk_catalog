@@ -30,7 +30,7 @@ bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "jdk_catalog", version = "0.0.2-catalog.1")
 git_override(
     module_name = "jdk_catalog",
-    remote = "https://github.com/davido/jdk_catalog.git",
+    remote = "https://github.com/bazel-contrib/jdk_catalog.git",
     commit = "<catalog-commit>",
 )
 
