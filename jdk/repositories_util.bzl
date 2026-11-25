@@ -42,7 +42,7 @@ _RELEASE_CONFIGS = {
             },
         },
         "adoptium": {
-            "release": "11.0.33+10",
+            "release": "11.0.33.1+1",
             "platforms": {
                 "linux": ["ppc64le", "s390x"],
             },
@@ -96,7 +96,7 @@ _RELEASE_CONFIGS = {
             },
         },
         "adoptium": {
-            "release": "25.0.5+8",
+            "release": "25.0.5.1+2",
             "platforms": {
                 "linux": ["ppc64le", "riscv64", "s390x"],
             },

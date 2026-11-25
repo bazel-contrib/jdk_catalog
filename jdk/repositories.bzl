@@ -105,10 +105,10 @@ _JDK27_CONFIGS = [
     struct(
         name = "remotejdk27_linux_riscv64",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:riscv64"],
-        sha256 = "e788df9ad7db79a2356539a170d09340d0fc354412ce23881eef6c6339928ce2",
-        strip_prefix = "jdk-27.0.1.0.2+1",
+        sha256 = "8d03b2a87e5a9acf19b84d45d1195064656bbb17c5381a060d8d0ba7a3f409ed",
+        strip_prefix = "jdk-27.0.1.1+4",
         urls = [
-            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.0.2+1/OpenJDK27U-jdk_riscv64_linux_hotspot_27.0.1.0.2_1.tar.gz",
+            "https://github.com/adoptium/temurin27-binaries/releases/download/jdk-27.0.1.1+4/OpenJDK27U-jdk_riscv64_linux_hotspot_27.0.1.1_4.tar.gz",
         ],
         version = "27",
     ),
