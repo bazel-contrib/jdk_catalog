@@ -145,11 +145,12 @@ validation steps.
 
 ## Maintenance and support
 
-David Ostrovsky ([@davido](https://github.com/davido)) maintains this project
-on a best-effort volunteer basis and is the point of contact for the Rules
-Authors SIG. The goal is to respond to issues and pull requests within
-2–3 weeks; there is no guaranteed response time or commercial support.
-Additional maintainers are welcome.
+David Ostrovsky ([@davido](https://github.com/davido)) and John Cater
+([@katre](https://github.com/katre)) maintain this project on a best-effort
+volunteer basis; David is the point of contact for the Rules Authors SIG. The
+goal is to respond to issues and pull requests within 2–3 weeks; there is no
+guaranteed response time or commercial support. Additional maintainers are
+welcome.
 
 The catalog follows non-LTS JDK releases, whose vendor maintenance windows are
 short. A catalog entry does not extend the vendor's security support. Retiring
