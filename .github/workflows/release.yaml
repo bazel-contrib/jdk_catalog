@@ -17,7 +17,7 @@ jobs:
       id-token: write
       attestations: write
       contents: write
-    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@6f477811ffc3ed8a972933cbb43dae0dc051767b # v7.3.0
+    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@1d798ff015ed0696433e01e2c3ccbb2abefadad7 # v7.7.0
     with:
       tag_name: ${{ inputs.tag_name }}
       prerelease: false
