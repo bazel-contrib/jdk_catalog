@@ -9,7 +9,7 @@
       "enabled": false
     },
     {
-      "matchDepNames": ["bazel-contrib/.github"],
+      "matchDepNames": ["bazel-contrib/.github", "bazel-contrib/publish-to-bcr"],
       "pinDigests": false
     }
   ]
