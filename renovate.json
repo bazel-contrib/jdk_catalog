@@ -7,6 +7,10 @@
     {
       "matchManagers": ["bazel-module"],
       "enabled": false
+    },
+    {
+      "matchDepNames": ["bazel-contrib/.github"],
+      "pinDigests": false
     }
   ]
 }
