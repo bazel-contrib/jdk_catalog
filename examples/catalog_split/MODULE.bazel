@@ -2,7 +2,7 @@ module(name = "catalog_split_example")
 
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "java_tools", version = "23.0-davido.1")
-bazel_dep(name = "jdk_catalog", version = "0.0.2-catalog.1")
+bazel_dep(name = "jdk_catalog", version = "0.1.0")
 
 # These published split-prototype sources stay fixed during JDK catalog updates.
 git_override(
