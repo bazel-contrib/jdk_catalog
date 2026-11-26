@@ -1,6 +1,6 @@
 module(
     name = "jdk_catalog",
-    version = "0.1.1",
+    version = "0.1.2",
     bazel_compatibility = [">=9.3.0"],
     compatibility_level = 1,
 )
