@@ -31,7 +31,10 @@ jobs:
     with:
       tag_name: ${{ github.event.release.tag_name || inputs.tag_name }}
       registry_fork: bazel-contrib/bazel-central-registry
-      draft: true
+      # Open the BCR PR ready for review, not as a draft: a draft can't be
+      # merged and neither the module owners nor BCR maintainers could flip it.
+      # Matches rules_java/rules_go/rules_dotnet.
+      draft: false
       attest: true
     secrets:
       publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
