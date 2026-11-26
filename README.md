@@ -27,7 +27,7 @@ For now, add a Git override pinned to a commit whose module name is
 ```starlark
 # MODULE.bazel
 bazel_dep(name = "rules_java", version = "9.9.0")
-bazel_dep(name = "jdk_catalog", version = "0.1.1")
+bazel_dep(name = "jdk_catalog", version = "0.1.2")
 git_override(
     module_name = "jdk_catalog",
     remote = "https://github.com/bazel-contrib/jdk_catalog.git",

@@ -4,7 +4,7 @@ module(
 )
 
 bazel_dep(name = "rules_java", version = "9.9.0")
-bazel_dep(name = "jdk_catalog", version = "0.1.1")
+bazel_dep(name = "jdk_catalog", version = "0.1.2")
 
 # Test this checkout as a dependency of a separate module. After BCR publication,
 # consumers can use bazel_dep without an override.
